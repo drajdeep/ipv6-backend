@@ -50,11 +50,21 @@ def save_ip():
 @app.route('/stats', methods=['GET'])
 def get_stats():
     with sqlite3.connect(DATABASE) as conn:
-        cursor = conn.execute('SELECT ip, type, country, region, city, latitude, longitude FROM ip_addresses')
+        cursor = conn.execute('SELECT id, ip, type, country, region, city, latitude, longitude, tests_count FROM ip_addresses')
         results = cursor.fetchall()
-    stats = [{'ip': row[0], 'type': row[1], 'country': row[2], 'region': row[3], 'city': row[4], 
-              'latitude': row[5], 'longitude': row[6]} for row in results]
-    return jsonify(stats)
+
+    stats = [{
+        'id': row[0], 'ip': row[1], 'type': row[2], 'country': row[3], 
+        'region': row[4], 'city': row[5], 'latitude': row[6], 'longitude': row[7],
+        'tests_count': row[8]
+    } for row in results]
+
+    return jsonify({
+        'entries': stats,
+        'total_tests': sum(row[8] for row in results),
+        'ipv4_count': sum(1 for row in results if row[2] == 'IPv4'),
+        'ipv6_count': sum(1 for row in results if row[2] == 'IPv6')
+    })
 
 if __name__ == '__main__':
     init_db()
