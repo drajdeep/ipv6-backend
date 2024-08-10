@@ -9,20 +9,23 @@ DATABASE = 'ip_data.db'
 
 def init_db():
     with sqlite3.connect(DATABASE) as conn:
-        conn.execute('''
-            CREATE TABLE IF NOT EXISTS ip_addresses (
-                id INTEGER PRIMARY KEY, 
-                ip TEXT, 
-                type TEXT,
-                country TEXT,
-                region TEXT,
-                city TEXT,
-                latitude REAL,
-                longitude REAL,
-                tests_count INTEGER DEFAULT 1
-            )
-        ''')
+        cursor = conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='ip_addresses';")
+        if cursor.fetchone() is None:
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS ip_addresses (
+                    id INTEGER PRIMARY KEY, 
+                    ip TEXT, 
+                    type TEXT,
+                    country TEXT,
+                    region TEXT,
+                    city TEXT,
+                    latitude REAL,
+                    longitude REAL,
+                    tests_count INTEGER DEFAULT 1
+                )
+            ''')
     conn.close()
+
 
 @app.route('/save-ip', methods=['POST'])
 def save_ip():
