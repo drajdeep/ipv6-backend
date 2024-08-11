@@ -24,6 +24,7 @@ def init_db():
                     tests_count INTEGER DEFAULT 1
                 )
             ''')
+        conn.commit()  # Ensure the changes are committed if the table was created
     conn.close()
 
 
